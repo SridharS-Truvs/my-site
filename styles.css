@@ -7,20 +7,20 @@
 /* ── 1. CUSTOM PROPERTIES ──────────────────────────────────────────────────── */
 :root {
   /* Colors */
-  --bg:             #0B0C0F;
-  --bg-surface:     #131519;
-  --bg-elevated:    #1A1D24;
-  --border:         #222630;
-  --border-light:   #2C3040;
+  --bg:             #0A1628;
+  --bg-surface:     #102040;
+  --bg-elevated:    #163058;
+  --border:         #1E3A6E;
+  --border-light:   #2A4E8C;
 
-  --text-primary:   #EDECEA;
-  --text-secondary: #9098A8;
-  --text-muted:     #555D6E;
+  --text-primary:   #FFFFFF;
+  --text-secondary: #B8CCE8;
+  --text-muted:     #6B8AB8;
 
-  --accent:         #F0A500;
-  --accent-hover:   #D49200;
-  --accent-dim:     rgba(240, 165, 0, 0.10);
-  --accent-glow:    rgba(240, 165, 0, 0.18);
+  --accent:         #4A9EFF;
+  --accent-hover:   #2E8FFF;
+  --accent-dim:     rgba(74, 158, 255, 0.10);
+  --accent-glow:    rgba(74, 158, 255, 0.18);
 
   /* Typography */
   --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
