@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logo Showcase — Sridhar K. Sannidhi × GW2R</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:           #0B0C0F;
+      --bg-surface:   #131519;
+      --border:       #222630;
+      --border-light: #2C3040;
+      --text:         #EDECEA;
+      --text-muted:   #555D6E;
+      --accent:       #F0A500;
+      --light-bg:     #F2F1ED;
+      --light-text:   #1A1D24;
+      --light-muted:  #9098A8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* ── Header ── */
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding: 48px 0 40px;
+      margin-bottom: 56px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .header__title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.25rem;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .header__meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .header__tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .header__desc {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    /* ── Notes ── */
+    .notes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 56px;
+    }
+
+    .note {
+      background: var(--bg-surface);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .note__num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+    }
+
+    .note__title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .note__body {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── Logo Rows ── */
+    .logo-row {
+      margin-bottom: 48px;
+    }
+
+    .logo-row__header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-row__num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+    }
+
+    .logo-row__title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ── Panels ── */
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .panel__label-bar {
+      padding: 10px 32px;
+      border-bottom: 1px solid;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .panel__label-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .panel__body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 52px 40px;
+    }
+
+    /* Dark panel */
+    .panel--dark {
+      background: #0B0C0F;
+      color: #EDECEA;
+    }
+
+    .panel--dark .panel__label-bar {
+      border-color: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .panel--dark .panel__dot {
+      background: #333840;
+    }
+
+    .panel--dark .panel__label-text {
+      color: #444C5A;
+    }
+
+    /* Light panel */
+    .panel--light {
+      background: #F2F1ED;
+      color: #1A1D24;
+    }
+
+    .panel--light .panel__label-bar {
+      border-color: rgba(0,0,0,0.07);
+      background: rgba(0,0,0,0.02);
+    }
+
+    .panel--light .panel__dot {
+      background: #C8C5BC;
+    }
+
+    .panel--light .panel__label-text {
+      color: #9C9990;
+    }
+
+    /* ── SVG sizing ── */
+    .panel__body svg {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* V1: horizontal lockup — control height directly */
+    .logo-v1 .panel__body svg {
+      height: 44px;
+      width: auto;
+    }
+
+    /* V2: tall typographic — control height */
+    .logo-v2 .panel__body svg {
+      height: 70px;
+      width: auto;
+    }
+
+    /* ── Usage notes ── */
+    .usage {
+      border-top: 1px solid var(--border);
+      margin-top: 56px;
+      padding-top: 40px;
+    }
+
+    .usage__title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .usage__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .usage__item {
+      background: var(--bg-surface);
+      padding: 20px 24px;
+    }
+
+    .usage__item-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .usage__item-text {
+      font-size: 0.825rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .page { padding: 0 20px; }
+      .notes { grid-template-columns: 1fr; }
+      .panels { grid-template-columns: 1fr; }
+      .usage__grid { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; }
+      .header__meta { align-items: flex-start; }
+      .logo-v1 .panel__body svg { height: 32px; }
+      .logo-v2 .panel__body svg { height: 56px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Header -->
+    <header class="header">
+      <h1 class="header__title">Logo Showcase</h1>
+      <div class="header__meta">
+        <span class="header__tag">Sridhar K. Sannidhi &times; GW2R</span>
+        <span class="header__desc">2 Variants &nbsp;&middot;&nbsp; Dark &amp; Light Backgrounds</span>
+      </div>
+    </header>
+
+    <!-- Concept notes -->
+    <div class="notes">
+      <div class="note">
+        <div class="note__num">V1 — MARK + WORDMARK</div>
+        <div class="note__title">Geometric S + Personal Brand</div>
+        <div class="note__body">A single-stroke geometric "S" in amber traces the letterform as an architectural path — open, precise, calligraphic. Paired with the full name in Cormorant Garamond and the firm/discipline identifier in IBM Plex Mono. Use for the personal consulting brand.</div>
+      </div>
+      <div class="note">
+        <div class="note__num">V2 — TYPOGRAPHIC</div>
+        <div class="note__title">GW2R Company Mark</div>
+        <div class="note__body">The firm acronym "GW2R" set in ultra-light Cormorant Garamond. The "2" in amber becomes the visual signature — the unusual character in the name and the brand. Subdued subtitle in tracked mono. Use for the company brand and formal documents.</div>
+      </div>
+    </div>
+
+    <!-- ── LOGO V1 ── -->
+    <div class="logo-row logo-v1">
+      <div class="logo-row__header">
+        <span class="logo-row__num">01</span>
+        <span class="logo-row__title">Mark + Wordmark &mdash; logo-v1.svg</span>
+      </div>
+      <div class="panels">
+
+        <!-- Dark -->
+        <div class="panel panel--dark">
+          <div class="panel__label-bar">
+            <span class="panel__dot"></span>
+            <span class="panel__label-text">Dark Background</span>
+          </div>
+          <div class="panel__body">
+            <!-- Logo V1 — inline SVG, inherits color: #EDECEA from .panel--dark -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 58" aria-label="Sridhar K. Sannidhi logo on dark background">
+              <g transform="translate(2, 4)">
+                <path d="M 5,2 H 24 Q 33,2 33,11 V 20 Q 33,27 26,27 H 8 Q 1,27 1,34 V 42 Q 1,49 8,49 H 28"
+                  stroke="#F0A500" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <text x="52" y="32" font-family="'Cormorant Garamond', Georgia, serif"
+                font-size="23" font-weight="400" letter-spacing="0.06em" fill="currentColor">SRIDHAR K. SANNIDHI</text>
+              <line x1="52" y1="38" x2="375" y2="38" stroke="currentColor" stroke-width="0.5" opacity="0.12"/>
+              <text x="52" y="50" font-family="'IBM Plex Mono', monospace"
+                font-size="8" font-weight="400" letter-spacing="0.2em" fill="#F0A500" opacity="0.9">GW2R · CLOUD &amp; AI ARCHITECTURE</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Light -->
+        <div class="panel panel--light">
+          <div class="panel__label-bar">
+            <span class="panel__dot"></span>
+            <span class="panel__label-text">Light Background</span>
+          </div>
+          <div class="panel__body">
+            <!-- Logo V1 — same SVG, color: #1A1D24 from .panel--light -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 58" aria-label="Sridhar K. Sannidhi logo on light background">
+              <g transform="translate(2, 4)">
+                <path d="M 5,2 H 24 Q 33,2 33,11 V 20 Q 33,27 26,27 H 8 Q 1,27 1,34 V 42 Q 1,49 8,49 H 28"
+                  stroke="#F0A500" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <text x="52" y="32" font-family="'Cormorant Garamond', Georgia, serif"
+                font-size="23" font-weight="400" letter-spacing="0.06em" fill="currentColor">SRIDHAR K. SANNIDHI</text>
+              <line x1="52" y1="38" x2="375" y2="38" stroke="currentColor" stroke-width="0.5" opacity="0.12"/>
+              <text x="52" y="50" font-family="'IBM Plex Mono', monospace"
+                font-size="8" font-weight="400" letter-spacing="0.2em" fill="#F0A500" opacity="0.9">GW2R · CLOUD &amp; AI ARCHITECTURE</text>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── LOGO V2 ── -->
+    <div class="logo-row logo-v2">
+      <div class="logo-row__header">
+        <span class="logo-row__num">02</span>
+        <span class="logo-row__title">Typographic &mdash; logo-v2.svg</span>
+      </div>
+      <div class="panels">
+
+        <!-- Dark -->
+        <div class="panel panel--dark">
+          <div class="panel__label-bar">
+            <span class="panel__dot"></span>
+            <span class="panel__label-text">Dark Background</span>
+          </div>
+          <div class="panel__body">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 82" aria-label="GW2R logo on dark background">
+              <text x="4" y="63" font-family="'Cormorant Garamond', Georgia, serif"
+                font-size="63" font-weight="300" letter-spacing="0.01em" xml:space="preserve"
+              ><tspan fill="currentColor">GW</tspan><tspan fill="#F0A500">2</tspan><tspan fill="currentColor">R</tspan></text>
+              <line x1="4" y1="70" x2="216" y2="70" stroke="currentColor" stroke-width="0.6" opacity="0.16"/>
+              <text x="4" y="79" font-family="'IBM Plex Mono', monospace"
+                font-size="7.5" font-weight="400" letter-spacing="0.22em" fill="currentColor" opacity="0.42">GROW WEALTH 2 RETIRE</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Light -->
+        <div class="panel panel--light">
+          <div class="panel__label-bar">
+            <span class="panel__dot"></span>
+            <span class="panel__label-text">Light Background</span>
+          </div>
+          <div class="panel__body">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 82" aria-label="GW2R logo on light background">
+              <text x="4" y="63" font-family="'Cormorant Garamond', Georgia, serif"
+                font-size="63" font-weight="300" letter-spacing="0.01em" xml:space="preserve"
+              ><tspan fill="currentColor">GW</tspan><tspan fill="#F0A500">2</tspan><tspan fill="currentColor">R</tspan></text>
+              <line x1="4" y1="70" x2="216" y2="70" stroke="currentColor" stroke-width="0.6" opacity="0.16"/>
+              <text x="4" y="79" font-family="'IBM Plex Mono', monospace"
+                font-size="7.5" font-weight="400" letter-spacing="0.22em" fill="currentColor" opacity="0.42">GROW WEALTH 2 RETIRE</text>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Usage guidance -->
+    <div class="usage">
+      <div class="usage__title">Usage Guidance</div>
+      <div class="usage__grid">
+        <div class="usage__item">
+          <div class="usage__item-label">V1 — When to use</div>
+          <div class="usage__item-text">Website header, email signatures, LinkedIn banner, proposal cover pages, business cards. Primary personal brand mark.</div>
+        </div>
+        <div class="usage__item">
+          <div class="usage__item-label">V2 — When to use</div>
+          <div class="usage__item-text">Company letterhead, formal documents, presentation title slides, investor materials. GW2R company identity.</div>
+        </div>
+        <div class="usage__item">
+          <div class="usage__item-label">Both — Technical notes</div>
+          <div class="usage__item-text">SVG files use <code style="font-family: monospace; font-size: 0.8em; color: #F0A500;">currentColor</code> for text. Wrap in a container with <code style="font-family: monospace; font-size: 0.8em; color: #F0A500;">color: #EDECEA</code> (dark) or <code style="font-family: monospace; font-size: 0.8em; color: #F0A500;">color: #1A1D24</code> (light).</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

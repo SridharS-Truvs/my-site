@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sridhar K. Sannidhi — Enterprise Cloud & AI Architecture</title>
+  <meta name="description" content="GW2R provides senior enterprise architecture expertise — cloud, AI/ML, EA frameworks — for firms that need results, not reports." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ── Chat Widget Styles ─────────────────────────────────────────────── -->
+  <style>
+    /* Launcher stack */
+    #cw-launchers {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      transition: opacity 200ms cubic-bezier(0.22,1,0.36,1),
+                  transform 200ms cubic-bezier(0.22,1,0.36,1);
+    }
+    #cw-launchers.cw-hidden { opacity: 0; pointer-events: none; transform: scale(0.92) translateY(8px); }
+
+    .cw-btn-launch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+      border-radius: 999px;
+      padding: 0 20px 0 16px;
+      height: 48px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 160ms cubic-bezier(0.22,1,0.36,1),
+                  box-shadow 160ms cubic-bezier(0.22,1,0.36,1);
+    }
+    .cw-btn-launch svg { flex-shrink: 0; }
+
+    #cw-btn-chat {
+      background: #F0A500;
+      color: #0B0C0F;
+      box-shadow: 0 4px 24px rgba(240,165,0,0.35);
+    }
+    #cw-btn-chat:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(240,165,0,0.45);
+    }
+
+    #cw-btn-proposal {
+      background: #131519;
+      color: #EDECEA;
+      border: 1px solid #2C3040;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    #cw-btn-proposal:hover {
+      transform: translateY(-2px);
+      border-color: #F0A500;
+      color: #F0A500;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+    }
+
+    /* Panel */
+    #cw-panel {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9000;
+      width: 380px;
+      max-width: calc(100vw - 32px);
+      height: 520px;
+      max-height: calc(100svh - 56px);
+      background: #131519;
+      border: 1px solid #222630;
+      border-radius: 14px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transform-origin: bottom right;
+      transition: opacity 200ms cubic-bezier(0.22,1,0.36,1),
+                  transform 200ms cubic-bezier(0.22,1,0.36,1);
+    }
+    #cw-panel.cw-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px) scale(0.97);
+    }
+
+    /* Header */
+    #cw-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px 0 18px;
+      height: 56px;
+      border-bottom: 1px solid #222630;
+      flex-shrink: 0;
+    }
+    .cw-header-info { display: flex; flex-direction: column; gap: 1px; }
+    .cw-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: #EDECEA;
+      letter-spacing: 0.02em;
+    }
+    .cw-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555D6E;
+    }
+    #cw-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #555D6E;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 150ms, background 150ms;
+      flex-shrink: 0;
+    }
+    #cw-close:hover { color: #EDECEA; background: rgba(255,255,255,0.06); }
+
+    /* Messages */
+    #cw-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+    #cw-messages::-webkit-scrollbar { width: 4px; }
+    #cw-messages::-webkit-scrollbar-track { background: transparent; }
+    #cw-messages::-webkit-scrollbar-thumb { background: #2C3040; border-radius: 2px; }
+
+    /* Message bubbles */
+    .cw-msg {
+      max-width: 82%;
+      padding: 10px 13px;
+      border-radius: 10px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    .cw-msg--ai {
+      background: #1A1D24;
+      color: #EDECEA;
+      border-bottom-left-radius: 3px;
+      align-self: flex-start;
+      border: 1px solid #2C3040;
+    }
+    .cw-msg--user {
+      background: #F0A500;
+      color: #0B0C0F;
+      border-bottom-right-radius: 3px;
+      align-self: flex-end;
+      font-weight: 500;
+    }
+    .cw-msg--error {
+      background: rgba(224,85,85,0.12);
+      color: #E08888;
+      border: 1px solid rgba(224,85,85,0.25);
+      border-bottom-left-radius: 3px;
+      align-self: flex-start;
+      font-size: 0.8rem;
+    }
+
+    /* Typing indicator (shared by both widgets) */
+    .cw-typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 11px 13px;
+      background: #1A1D24;
+      border: 1px solid #2C3040;
+      border-radius: 10px;
+      border-bottom-left-radius: 3px;
+      align-self: flex-start;
+    }
+    .cw-typing-indicator span {
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #555D6E;
+      animation: cw-bounce 1.3s infinite;
+    }
+    .cw-typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .cw-typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes cw-bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Input area */
+    #cw-input-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-top: 1px solid #222630;
+      flex-shrink: 0;
+      background: #0F1114;
+    }
+    #cw-input {
+      flex: 1;
+      background: #1A1D24;
+      border: 1px solid #2C3040;
+      border-radius: 8px;
+      color: #EDECEA;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.875rem;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 150ms;
+    }
+    #cw-input::placeholder { color: #555D6E; }
+    #cw-input:focus { border-color: rgba(240,165,0,0.5); }
+    #cw-input:disabled { opacity: 0.5; }
+    #cw-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #F0A500;
+      border: none;
+      color: #0B0C0F;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 150ms, transform 150ms, opacity 150ms;
+    }
+    #cw-send:hover:not(:disabled) { background: #D49200; transform: scale(1.05); }
+    #cw-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Proposal panel ──────────────────────────────────────────────────── */
+    #pw-panel {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9000;
+      width: 380px;
+      max-width: calc(100vw - 32px);
+      height: 540px;
+      max-height: calc(100svh - 56px);
+      background: #131519;
+      border: 1px solid #222630;
+      border-radius: 14px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transform-origin: bottom right;
+      transition: opacity 200ms cubic-bezier(0.22,1,0.36,1),
+                  transform 200ms cubic-bezier(0.22,1,0.36,1);
+    }
+    #pw-panel.cw-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px) scale(0.97);
+    }
+
+    /* Proposal header */
+    #pw-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px 10px 18px;
+      border-bottom: 1px solid #222630;
+      flex-shrink: 0;
+      background: #0F1114;
+    }
+    .pw-header-main { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+    .pw-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: #EDECEA;
+      letter-spacing: 0.02em;
+    }
+    .pw-progress { display: flex; align-items: center; gap: 10px; }
+    .pw-step-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555D6E;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pw-bar-track {
+      flex: 1;
+      height: 2px;
+      background: #222630;
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    #pw-bar-fill {
+      height: 100%;
+      background: #F0A500;
+      border-radius: 1px;
+      width: 0%;
+      transition: width 400ms cubic-bezier(0.22,1,0.36,1);
+    }
+    #pw-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #555D6E;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 150ms, background 150ms;
+      flex-shrink: 0;
+      margin-left: 10px;
+    }
+    #pw-close:hover { color: #EDECEA; background: rgba(255,255,255,0.06); }
+
+    /* Proposal messages (reuse cw-msg styles via shared class) */
+    #pw-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+    #pw-messages::-webkit-scrollbar { width: 4px; }
+    #pw-messages::-webkit-scrollbar-track { background: transparent; }
+    #pw-messages::-webkit-scrollbar-thumb { background: #2C3040; border-radius: 2px; }
+
+    /* Proposal input area */
+    #pw-input-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-top: 1px solid #222630;
+      flex-shrink: 0;
+      background: #0F1114;
+    }
+    #pw-input {
+      flex: 1;
+      background: #1A1D24;
+      border: 1px solid #2C3040;
+      border-radius: 8px;
+      color: #EDECEA;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.875rem;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 150ms;
+    }
+    #pw-input::placeholder { color: #555D6E; }
+    #pw-input:focus { border-color: rgba(240,165,0,0.5); }
+    #pw-input:disabled { opacity: 0.5; }
+    #pw-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #F0A500;
+      border: none;
+      color: #0B0C0F;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 150ms, transform 150ms, opacity 150ms;
+    }
+    #pw-send:hover:not(:disabled) { background: #D49200; transform: scale(1.05); }
+    #pw-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* Proposal complete state */
+    #pw-input-area.pw-complete {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="#hero" class="nav__brand" aria-label="Sridhar K. Sannidhi — Home">
+        <!-- Logo V1 inline — fonts already loaded by page, no @import needed -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 58"
+             aria-hidden="true" focusable="false" class="nav__logo">
+          <g transform="translate(2, 4)">
+            <path
+              d="M 5,2 H 24 Q 33,2 33,11 V 20 Q 33,27 26,27 H 8 Q 1,27 1,34 V 42 Q 1,49 8,49 H 28"
+              stroke="#F0A500" stroke-width="4.5" fill="none"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <text x="52" y="32"
+            font-family="'Cormorant Garamond', Georgia, serif"
+            font-size="23" font-weight="400" letter-spacing="0.06em"
+            fill="currentColor">SRIDHAR K. SANNIDHI</text>
+          <line x1="52" y1="38" x2="375" y2="38"
+            stroke="currentColor" stroke-width="0.5" opacity="0.12"/>
+          <text x="52" y="50"
+            font-family="'IBM Plex Mono', 'Menlo', 'Courier New', monospace"
+            font-size="8" font-weight="400" letter-spacing="0.2em"
+            fill="#F0A500" opacity="0.9">GW2R · CLOUD &amp; AI ARCHITECTURE</text>
+        </svg>
+      </a>
+      <ul class="nav__links" id="navLinks" role="list">
+        <li><a href="#about" class="nav__link">About</a></li>
+        <li><a href="#services" class="nav__link">Services</a></li>
+        <li><a href="#differentiators" class="nav__link">Why GW2R</a></li>
+        <li><a href="#contact" class="nav__link nav__link--cta">Book a Session</a></li>
+      </ul>
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" id="hero">
+    <div class="hero__bg-grid" aria-hidden="true"></div>
+    <div class="container hero__container">
+      <div class="hero__eyebrow">
+        <span class="tag">Grow Wealth 2 Retire LLC</span>
+        <span class="hero__eyebrow-sep" aria-hidden="true">—</span>
+        <span class="tag">Frisco, TX</span>
+      </div>
+      <h1 class="hero__headline">
+        <span class="hero__line hero__line--1">Cloud migrations delivered.</span>
+        <span class="hero__line hero__line--2">AI/ML in production.</span>
+        <span class="hero__line hero__line--3">Architecture that holds.</span>
+      </h1>
+      <p class="hero__sub">
+        Senior enterprise architecture expertise — cloud, AI/ML, EA frameworks — for firms that need results, not reports. 25+ years. Goldman Sachs. Google. Oracle.
+      </p>
+      <div class="hero__actions">
+        <a href="#contact" class="btn btn--primary">Book a Discovery Session</a>
+        <a href="#services" class="btn btn--ghost">See Services</a>
+      </div>
+      <div class="hero__stats" role="list">
+        <div class="hero__stat" role="listitem">
+          <span class="hero__stat-number">25<span class="hero__stat-plus">+</span></span>
+          <span class="hero__stat-label">Years Enterprise Delivery</span>
+        </div>
+        <div class="hero__stat-divider" aria-hidden="true"></div>
+        <div class="hero__stat" role="listitem">
+          <span class="hero__stat-number">5</span>
+          <span class="hero__stat-label">Cloud Certifications</span>
+        </div>
+        <div class="hero__stat-divider" aria-hidden="true"></div>
+        <div class="hero__stat" role="listitem">
+          <span class="hero__stat-number">4</span>
+          <span class="hero__stat-label">Cloud Platforms</span>
+        </div>
+        <div class="hero__stat-divider" aria-hidden="true"></div>
+        <div class="hero__stat" role="listitem">
+          <span class="hero__stat-number">4</span>
+          <span class="hero__stat-label">FS Firms as Staff Architect</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero__scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <div class="hero__scroll-line"></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ABOUT -->
+    <section class="section about" id="about" aria-labelledby="about-heading">
+      <div class="container about__container">
+        <div class="about__content reveal">
+          <div class="section__label">About GW2R</div>
+          <h2 class="section__heading" id="about-heading">The gap most initiatives don't survive</h2>
+          <p class="about__lead">
+            Firms spend 12–18 months and significant budget on cloud and AI initiatives that stall — not because the technology is wrong, but because architecture decisions come too late, from people too far from the problem. GW2R closes that gap. Directly.
+          </p>
+          <ul class="about__list">
+            <li>I spent my career at Goldman Sachs, Citigroup, Nomura Securities, Prudential Financial, Google, and Oracle — not as a consultant, but as a staff architect accountable for delivery</li>
+            <li>Direct access: TOGAF 9.1-certified architect, 25+ years of production environments — no junior team, no account manager buffer</li>
+            <li>Cloud-agnostic: AWS, Google Cloud, Oracle Cloud, Azure — all 4, no vendor affiliation, no incentive to push one platform</li>
+            <li>Financial services native: I understand regulatory constraints and risk tolerance before the engagement starts</li>
+          </ul>
+        </div>
+        <div class="about__credentials reveal">
+          <div class="about__employers">
+            <div class="about__employers-label">Prior Staff Roles</div>
+            <div class="about__employer-tags">
+              <span class="employer-tag">Goldman Sachs</span>
+              <span class="employer-tag">Citigroup</span>
+              <span class="employer-tag">Nomura Securities</span>
+              <span class="employer-tag">Prudential Financial</span>
+              <span class="employer-tag">Google</span>
+              <span class="employer-tag">Oracle</span>
+            </div>
+          </div>
+          <div class="about__certs">
+            <div class="about__certs-label">Active Certifications</div>
+            <ul class="cert-list">
+              <li class="cert-item">
+                <span class="cert-dot"></span>
+                TOGAF 9.1 Certified Architect
+              </li>
+              <li class="cert-item">
+                <span class="cert-dot"></span>
+                AWS Solutions Architect Associate
+              </li>
+              <li class="cert-item">
+                <span class="cert-dot"></span>
+                Google Professional Cloud Architect
+              </li>
+              <li class="cert-item">
+                <span class="cert-dot"></span>
+                Google Professional Data Engineer
+              </li>
+              <li class="cert-item">
+                <span class="cert-dot"></span>
+                Oracle Associate Cloud Architect
+              </li>
+            </ul>
+          </div>
+          <div class="about__industries">
+            <div class="about__industries-label">Industries Served</div>
+            <div class="industry-tags">
+              <span class="industry-tag">Financial Services</span>
+              <span class="industry-tag">Federal Government</span>
+              <span class="industry-tag">State Government</span>
+              <span class="industry-tag">Enterprise IT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section services" id="services" aria-labelledby="services-heading">
+      <div class="container">
+        <div class="section__header reveal">
+          <div class="section__label">What GW2R Delivers</div>
+          <h2 class="section__heading" id="services-heading">Service Portfolio</h2>
+          <p class="section__sub">Every engagement scoped to a specific problem. No packaged solutions retrofitted to your situation.</p>
+        </div>
+        <div class="services__grid">
+
+          <article class="service-card reveal" aria-labelledby="svc1-heading">
+            <div class="service-card__number">01</div>
+            <h3 class="service-card__title" id="svc1-heading">AI/ML Enablement</h3>
+            <ul class="service-card__list">
+              <li>Production model development: underwriting models, KPI analytics dashboards, risk scoring</li>
+              <li>Platforms: Vertex AI, BigQuery ML, AutoML, Python / Scikit-learn</li>
+              <li>Deployed model + documented architecture + team handoff</li>
+            </ul>
+            <div class="service-card__deliverable">
+              <span class="service-card__deliverable-label">Deliverable</span>
+              Production-grade ML system
+            </div>
+          </article>
+
+          <article class="service-card reveal" aria-labelledby="svc2-heading">
+            <div class="service-card__number">02</div>
+            <h3 class="service-card__title" id="svc2-heading">Cloud Architecture &amp; Migration</h3>
+            <ul class="service-card__list">
+              <li>Multi-cloud architecture design: AWS, Google Cloud, Oracle Cloud, Azure</li>
+              <li>Migration approach selected by your risk tolerance: lift-and-shift, re-platform, or re-architect</li>
+              <li>5 active cloud certifications across all major platforms</li>
+            </ul>
+            <div class="service-card__deliverable">
+              <span class="service-card__deliverable-label">Deliverable</span>
+              Architecture blueprint + migration runbook
+            </div>
+          </article>
+
+          <article class="service-card reveal" aria-labelledby="svc3-heading">
+            <div class="service-card__number">03</div>
+            <h3 class="service-card__title" id="svc3-heading">Enterprise Architecture Advisory</h3>
+            <ul class="service-card__list">
+              <li>EA framework implementation: TOGAF 9.1 (certified), Zachman</li>
+              <li>Service portfolio design and capability mapping</li>
+              <li>Architecture governance: review boards, decision frameworks, standards</li>
+            </ul>
+            <div class="service-card__deliverable">
+              <span class="service-card__deliverable-label">Deliverable</span>
+              EA artifacts + governance model
+            </div>
+          </article>
+
+          <article class="service-card reveal" aria-labelledby="svc4-heading">
+            <div class="service-card__number">04</div>
+            <h3 class="service-card__title" id="svc4-heading">Discovery &amp; Architecture Workshops</h3>
+            <ul class="service-card__list">
+              <li>Structured 1–3 day sessions with your technical and business leadership</li>
+              <li>Current-state assessment: cloud maturity, AI/ML readiness, architecture gaps</li>
+              <li>Most engagements start here</li>
+            </ul>
+            <div class="service-card__deliverable">
+              <span class="service-card__deliverable-label">Deliverable</span>
+              Findings report + prioritized roadmap
+            </div>
+          </article>
+
+          <article class="service-card reveal" aria-labelledby="svc5-heading">
+            <div class="service-card__number">05</div>
+            <h3 class="service-card__title" id="svc5-heading">Solution Architecture &amp; Proposals</h3>
+            <ul class="service-card__list">
+              <li>Architecture documentation, vendor evaluations, board-ready solution designs</li>
+              <li>Use cases: RFP responses, capability maps, technology selection rationale</li>
+              <li>Client-ready document set, defensible and audit-ready</li>
+            </ul>
+            <div class="service-card__deliverable">
+              <span class="service-card__deliverable-label">Deliverable</span>
+              Client-ready document set
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- DIFFERENTIATORS -->
+    <section class="section diff" id="differentiators" aria-labelledby="diff-heading">
+      <div class="container">
+        <div class="section__header reveal">
+          <div class="section__label">Why GW2R</div>
+          <h2 class="section__heading" id="diff-heading">Not a consulting firm</h2>
+          <p class="section__sub">The difference is who does the work — and what they've been accountable for before.</p>
+        </div>
+        <div class="diff__table-wrap reveal">
+          <table class="diff__table" aria-label="GW2R versus consulting firm comparison">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col" class="diff__col--gw2r">GW2R</th>
+                <th scope="col" class="diff__col--other">Consulting Firm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="diff__attr">Who does the work</td>
+                <td class="diff__val diff__val--gw2r">Sridhar directly — 25+ years, staff roles</td>
+                <td class="diff__val diff__val--other">Junior team; senior partner visible at kickoff</td>
+              </tr>
+              <tr>
+                <td class="diff__attr">Cloud stance</td>
+                <td class="diff__val diff__val--gw2r">Vendor-neutral; 4 platforms deployed</td>
+                <td class="diff__val diff__val--other">Often aligned to a preferred vendor</td>
+              </tr>
+              <tr>
+                <td class="diff__attr">Financial services depth</td>
+                <td class="diff__val diff__val--gw2r">Staff roles at Goldman, Citi, Nomura, Prudential</td>
+                <td class="diff__val diff__val--other">Industry vertical practice with generalist staff</td>
+              </tr>
+              <tr>
+                <td class="diff__attr">AI/ML capability</td>
+                <td class="diff__val diff__val--gw2r">Production models built and deployed</td>
+                <td class="diff__val diff__val--other">Strategy and roadmaps; rarely builds</td>
+              </tr>
+              <tr>
+                <td class="diff__attr">Engagement model</td>
+                <td class="diff__val diff__val--gw2r">Problem-scoped; starts with discovery</td>
+                <td class="diff__val diff__val--other">SOW-driven; scope tends to expand</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="diff__facts reveal">
+          <div class="diff__fact">
+            <span class="diff__fact-num">25+</span>
+            <span class="diff__fact-text">years in production enterprise environments — not advisory roles, staff roles</span>
+          </div>
+          <div class="diff__fact">
+            <span class="diff__fact-num">5</span>
+            <span class="diff__fact-text">active cloud certifications: AWS, GCP Architect, GCP Data Engineer, Oracle Cloud, TOGAF 9.1</span>
+          </div>
+          <div class="diff__fact">
+            <span class="diff__fact-num">4</span>
+            <span class="diff__fact-text">financial services employers: Goldman Sachs, Citigroup, Nomura Securities, Prudential Financial</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS: removed until real client quotes are available -->
+    <!-- Client references available on request: sridhar@gw2r.com -->
+
+    <!-- CTA -->
+    <section class="section cta-section" id="cta" aria-labelledby="cta-heading">
+      <div class="container cta-section__container">
+        <div class="cta-section__content reveal">
+          <div class="section__label">Get Started</div>
+          <h2 class="cta-section__heading" id="cta-heading">Start with a Discovery Session</h2>
+          <p class="cta-section__sub">60 minutes. Scoped to your current problem. No commitment required.</p>
+          <ul class="cta-section__list">
+            <li>Current-state review: where you are, what's blocking you</li>
+            <li>Problem framing: root constraint identified, not just surface symptoms</li>
+            <li>2–3 concrete options: paths forward with trade-offs stated plainly</li>
+            <li>Output: written summary of findings and recommended next step</li>
+          </ul>
+          <p class="cta-section__note">
+            Most firms that delay a cloud or AI architecture decision by 6 months spend 2–3x more to unwind the accumulated technical debt.
+          </p>
+          <a href="#contact" class="btn btn--primary btn--large">Book a Discovery Session</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section contact" id="contact" aria-labelledby="contact-heading">
+      <div class="container contact__container">
+        <div class="contact__info reveal">
+          <div class="section__label">Contact</div>
+          <h2 class="section__heading" id="contact-heading">Let's talk about your problem</h2>
+          <p class="contact__sub">Engagements begin with a 60-minute discovery session. Describe what you're working on and I'll follow up within 1 business day.</p>
+          <div class="contact__direct">
+            <div class="contact__detail">
+              <span class="contact__detail-label">Email</span>
+              <a href="mailto:sridhar@gw2r.com" class="contact__detail-value">sridhar@gw2r.com</a>
+            </div>
+            <div class="contact__detail">
+              <span class="contact__detail-label">Location</span>
+              <span class="contact__detail-value">Frisco, TX</span>
+            </div>
+            <div class="contact__detail">
+              <span class="contact__detail-label">LinkedIn</span>
+              <a href="#" class="contact__detail-value">linkedin.com/in/sridhar-sannidhi</a>
+            </div>
+          </div>
+        </div>
+        <form class="contact__form reveal" id="contactForm" novalidate aria-label="Contact form">
+          <div class="form-row form-row--2col">
+            <div class="form-group">
+              <label class="form-label" for="firstName">First Name <span class="form-required" aria-hidden="true">*</span></label>
+              <input class="form-input" type="text" id="firstName" name="firstName" required autocomplete="given-name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lastName">Last Name <span class="form-required" aria-hidden="true">*</span></label>
+              <input class="form-input" type="text" id="lastName" name="lastName" required autocomplete="family-name" />
+            </div>
+          </div>
+          <div class="form-row form-row--2col">
+            <div class="form-group">
+              <label class="form-label" for="company">Company <span class="form-required" aria-hidden="true">*</span></label>
+              <input class="form-input" type="text" id="company" name="company" required autocomplete="organization" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="role">Your Role</label>
+              <input class="form-input" type="text" id="role" name="role" placeholder="CTO, VP Engineering, etc." autocomplete="organization-title" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email <span class="form-required" aria-hidden="true">*</span></label>
+            <input class="form-input" type="email" id="email" name="email" required autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="engagement">What are you working on?</label>
+            <select class="form-input form-select" id="engagement" name="engagement">
+              <option value="" disabled selected>Select an area</option>
+              <option value="ai-ml">AI/ML Enablement</option>
+              <option value="cloud">Cloud Architecture &amp; Migration</option>
+              <option value="ea">Enterprise Architecture Advisory</option>
+              <option value="discovery">Discovery &amp; Architecture Workshop</option>
+              <option value="solution">Solution Architecture &amp; Proposals</option>
+              <option value="other">Other / Not sure yet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="message">What's the problem you're trying to solve? <span class="form-required" aria-hidden="true">*</span></label>
+            <textarea class="form-input form-textarea" id="message" name="message" rows="5" required placeholder="Brief description of your current situation and what you're trying to achieve."></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full">Send Message</button>
+          <div class="form-success" id="formSuccess" role="status" aria-live="polite" hidden>
+            Your email client should open with the message pre-filled. If it didn't, email directly: sridhar@gw2r.com
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="container footer__container">
+      <div class="footer__brand">
+        <div class="footer__name">Sridhar K. Sannidhi</div>
+        <div class="footer__role">Director | Cloud Architect | Enterprise Architect</div>
+        <div class="footer__company">Grow Wealth 2 Retire LLC (GW2R) &nbsp;·&nbsp; Frisco, TX</div>
+      </div>
+      <div class="footer__certs">
+        <div class="footer__certs-label">Certifications</div>
+        <div class="footer__cert-row">
+          <span class="footer__cert">TOGAF 9.1</span>
+          <span class="footer__cert">AWS Solutions Architect</span>
+          <span class="footer__cert">GCP Cloud Architect</span>
+          <span class="footer__cert">GCP Data Engineer</span>
+          <span class="footer__cert">Oracle Cloud Architect</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="container">
+        <span>&copy; 2026 Grow Wealth 2 Retire LLC. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ─── Mobile Nav ────────────────────────────────────────────────────────────
+    const navToggle = document.getElementById('navToggle');
+    const navLinks  = document.getElementById('navLinks');
+    const nav       = document.getElementById('nav');
+
+    navToggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('is-open');
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      navToggle.classList.toggle('is-open', isOpen);
+      document.body.classList.toggle('nav-open', isOpen);
+    });
+
+    // Close mobile nav on link click
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('is-open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.classList.remove('is-open');
+        document.body.classList.remove('nav-open');
+      });
+    });
+
+    // ─── Sticky Nav Shadow ────────────────────────────────────────────────────
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('nav--scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // ─── Scroll Reveal ────────────────────────────────────────────────────────
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => revealObs.observe(el));
+
+    // ─── Contact Form — mailto: fallback (replace with backend endpoint when ready) ──
+    const form        = document.getElementById('contactForm');
+    const formSuccess = document.getElementById('formSuccess');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+
+      const firstName  = document.getElementById('firstName').value.trim();
+      const lastName   = document.getElementById('lastName').value.trim();
+      const company    = document.getElementById('company').value.trim();
+      const role       = document.getElementById('role').value.trim();
+      const email      = document.getElementById('email').value.trim();
+      const engagement = document.getElementById('engagement').value;
+      const message    = document.getElementById('message').value.trim();
+
+      if (!firstName || !lastName || !company || !email || !message) return;
+
+      const subject = encodeURIComponent('Discovery Session Request — ' + company);
+      const body    = encodeURIComponent(
+        'Name: ' + firstName + ' ' + lastName +
+        '\nCompany: ' + company +
+        (role    ? '\nRole: '        + role       : '') +
+        '\nEmail: ' + email +
+        (engagement ? '\nEngagement: ' + engagement : '') +
+        '\n\n' + message
+      );
+
+      window.location.href = 'mailto:sridhar@gw2r.com?subject=' + subject + '&body=' + body;
+
+      btn.disabled = true;
+      btn.textContent = 'Opening email client…';
+      formSuccess.hidden = false;
+      formSuccess.focus();
+    });
+
+    // ─── Smooth Scroll Polyfill ───────────────────────────────────────────────
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Update focus for accessibility
+          target.setAttribute('tabindex', '-1');
+          target.focus({ preventScroll: true });
+        }
+      });
+    });
+  </script>
+
+  <!-- ── Chat Widgets ──────────────────────────────────────────────────────── -->
+
+  <!-- Launcher stack -->
+  <div id="cw-launchers" aria-label="Chat options">
+    <button class="cw-btn-launch" id="cw-btn-proposal" aria-label="Open proposal intake">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+      Get Proposal
+    </button>
+    <button class="cw-btn-launch" id="cw-btn-chat" aria-label="Open chat with Sridhar's AI">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Ask me anything
+    </button>
+  </div>
+
+  <!-- Chat panel -->
+  <div id="cw-panel" class="cw-hidden" role="dialog"
+       aria-label="Chat with Sridhar's AI" aria-modal="false">
+
+    <div id="cw-header">
+      <div class="cw-header-info">
+        <span class="cw-title">Ask Sridhar's AI</span>
+        <span class="cw-subtitle">Cloud · AI/ML · Enterprise Architecture</span>
+      </div>
+      <button id="cw-close" aria-label="Close chat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="cw-messages" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+    <div id="cw-input-area">
+      <input id="cw-input" type="text"
+             placeholder="Ask about services, experience, approach…"
+             autocomplete="off" aria-label="Your message" />
+      <button id="cw-send" aria-label="Send message" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Proposal panel -->
+  <div id="pw-panel" class="cw-hidden" role="dialog"
+       aria-label="Get a Proposal" aria-modal="false">
+
+    <div id="pw-header">
+      <div class="pw-header-main">
+        <span class="pw-title">Get a Proposal</span>
+        <div class="pw-progress">
+          <span class="pw-step-label">Step <span id="pw-step-num">1</span> of 6</span>
+          <div class="pw-bar-track">
+            <div id="pw-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+      <button id="pw-close" aria-label="Close proposal form">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="pw-messages" role="log" aria-live="polite" aria-label="Proposal intake messages"></div>
+
+    <div id="pw-input-area">
+      <input id="pw-input" type="text"
+             placeholder="Type your answer…"
+             autocomplete="off" aria-label="Your answer" />
+      <button id="pw-send" aria-label="Send answer" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ── Shared widget helpers ──────────────────────────────────────────────────
+    function makeAppendMessage(container) {
+      return function appendMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = role === 'user'  ? 'cw-msg cw-msg--user'
+                      : role === 'error' ? 'cw-msg cw-msg--error'
+                                         : 'cw-msg cw-msg--ai';
+        div.textContent = text;
+        container.appendChild(div);
+        scrollBottom(container);
+      };
+    }
+
+    function makeShowTyping(container) {
+      return function showTyping() {
+        const el = document.createElement('div');
+        el.className = 'cw-typing-indicator';
+        el.innerHTML = '<span></span><span></span><span></span>';
+        container.appendChild(el);
+        scrollBottom(container);
+        return el;
+      };
+    }
+
+    function removeTyping(el) {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    }
+
+    function scrollBottom(container) {
+      requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+    }
+
+    // ── Q&A Chat Widget ────────────────────────────────────────────────────────
+    (function () {
+      const launchers = document.getElementById('cw-launchers');
+      const panel     = document.getElementById('cw-panel');
+      const closeBtn  = document.getElementById('cw-close');
+      const msgBox    = document.getElementById('cw-messages');
+      const input     = document.getElementById('cw-input');
+      const sendBtn   = document.getElementById('cw-send');
+      const btnChat   = document.getElementById('cw-btn-chat');
+
+      const appendMessage = makeAppendMessage(msgBox);
+      const showTyping    = makeShowTyping(msgBox);
+
+      let history   = [];
+      let isOpen    = false;
+      let isWaiting = false;
+      let welcomed  = false;
+
+      function openPanel() {
+        isOpen = true;
+        panel.classList.remove('cw-hidden');
+        launchers.classList.add('cw-hidden');
+        if (!welcomed) {
+          welcomed = true;
+          appendMessage('ai',
+            "Hi, I'm Sridhar's AI assistant. Ask me anything about his services, " +
+            "background, or how GW2R might help with your specific challenge."
+          );
+        }
+        setTimeout(() => input.focus(), 80);
+        scrollBottom(msgBox);
+      }
+
+      function closePanel() {
+        isOpen = false;
+        panel.classList.add('cw-hidden');
+        launchers.classList.remove('cw-hidden');
+      }
+
+      btnChat.addEventListener('click', openPanel);
+      closeBtn.addEventListener('click', closePanel);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen) closePanel(); });
+
+      input.addEventListener('input', () => { sendBtn.disabled = isWaiting || !input.value.trim(); });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!isWaiting && input.value.trim()) send(); }
+      });
+      sendBtn.addEventListener('click', () => { if (!isWaiting && input.value.trim()) send(); });
+
+      async function send() {
+        const text = input.value.trim();
+        if (!text || isWaiting) return;
+        appendMessage('user', text);
+        history.push({ role: 'user', content: text });
+        input.value = '';
+        input.disabled = true;
+        sendBtn.disabled = true;
+        isWaiting = true;
+        const typingEl = showTyping();
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: history })
+          });
+          removeTyping(typingEl);
+          if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || `HTTP ${res.status}`); }
+          const { message } = await res.json();
+          appendMessage('ai', message);
+          history.push({ role: 'assistant', content: message });
+        } catch (err) {
+          removeTyping(typingEl);
+          appendMessage('error', 'Something went wrong. Try again or email sridhar@gw2r.com directly.');
+          console.error('Chat error:', err);
+        }
+        isWaiting = false;
+        input.disabled = false;
+        sendBtn.disabled = !input.value.trim();
+        input.focus();
+      }
+    })();
+
+    // ── Proposal Intake Widget ─────────────────────────────────────────────────
+    (function () {
+      const launchers   = document.getElementById('cw-launchers');
+      const panel       = document.getElementById('pw-panel');
+      const closeBtn    = document.getElementById('pw-close');
+      const msgBox      = document.getElementById('pw-messages');
+      const input       = document.getElementById('pw-input');
+      const sendBtn     = document.getElementById('pw-send');
+      const inputArea   = document.getElementById('pw-input-area');
+      const btnProposal = document.getElementById('cw-btn-proposal');
+      const stepNumEl   = document.getElementById('pw-step-num');
+      const barFill     = document.getElementById('pw-bar-fill');
+
+      const appendMessage = makeAppendMessage(msgBox);
+      const showTyping    = makeShowTyping(msgBox);
+
+      const TRIGGER = "I'd like to get a proposal.";
+      let history   = [];
+      let isOpen    = false;
+      let isWaiting = false;
+      let started   = false;
+      let currentStep = 1;
+
+      function setStep(n) {
+        currentStep = n;
+        stepNumEl.textContent = n;
+        barFill.style.width = ((n / 6) * 100) + '%';
+      }
+
+      function openPanel() {
+        isOpen = true;
+        panel.classList.remove('cw-hidden');
+        launchers.classList.add('cw-hidden');
+        if (!started) {
+          started = true;
+          kickoffIntake();
+        } else {
+          setTimeout(() => input.focus(), 80);
+        }
+        scrollBottom(msgBox);
+      }
+
+      function closePanel() {
+        isOpen = false;
+        panel.classList.add('cw-hidden');
+        launchers.classList.remove('cw-hidden');
+      }
+
+      btnProposal.addEventListener('click', openPanel);
+      closeBtn.addEventListener('click', closePanel);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen) closePanel(); });
+
+      input.addEventListener('input', () => { sendBtn.disabled = isWaiting || !input.value.trim(); });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!isWaiting && input.value.trim()) send(); }
+      });
+      sendBtn.addEventListener('click', () => { if (!isWaiting && input.value.trim()) send(); });
+
+      // Auto-start the intake conversation
+      async function kickoffIntake() {
+        isWaiting = true;
+        input.disabled = true;
+        sendBtn.disabled = true;
+        // Seed the trigger message silently (not shown in UI)
+        history.push({ role: 'user', content: TRIGGER });
+        const typingEl = showTyping();
+        await callApi(typingEl);
+      }
+
+      async function send() {
+        const text = input.value.trim();
+        if (!text || isWaiting) return;
+        appendMessage('user', text);
+        history.push({ role: 'user', content: text });
+        input.value = '';
+        input.disabled = true;
+        sendBtn.disabled = true;
+        isWaiting = true;
+        const typingEl = showTyping();
+        await callApi(typingEl);
+      }
+
+      async function callApi(typingEl) {
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: history })
+          });
+          removeTyping(typingEl);
+          if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || `HTTP ${res.status}`); }
+          const data = await res.json();
+          appendMessage('ai', data.message);
+          history.push({ role: 'assistant', content: data.message });
+
+          // Update progress bar
+          if (data.intake_step) setStep(data.intake_step);
+
+          // Handle completion
+          if (data.intake_complete) {
+            inputArea.classList.add('pw-complete');
+            // Post structured data to backend stub
+            fetch('/api/generate-proposal', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                intake_data: data.intake_data,
+                conversation: history
+              })
+            }).catch(err => console.error('generate-proposal error:', err));
+            return;
+          }
+        } catch (err) {
+          removeTyping(typingEl);
+          appendMessage('error', 'Something went wrong. Try again or email sridhar@gw2r.com directly.');
+          console.error('Proposal error:', err);
+        }
+        isWaiting = false;
+        input.disabled = false;
+        sendBtn.disabled = !input.value.trim();
+        setTimeout(() => input.focus(), 80);
+      }
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 82"
+     role="img" aria-labelledby="logo-v2-title">
+  <title id="logo-v2-title">GW2R — Grow Wealth 2 Retire</title>
+  <defs>
+    <style><![CDATA[
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+    ]]></style>
+  </defs>
+
+  <!--
+    PRIMARY MARK: "GW2R"
+    Cormorant Garamond weight 300 — ultra-light, high contrast, editorial.
+    "GW" and "R" in currentColor (adapts to dark/light context).
+    "2" in amber — the unusual character in the name becomes the visual
+    anchor and brand signature. Reads as "Grow Wealth 2 Retire" abbreviated.
+  -->
+  <text
+    x="4"
+    y="63"
+    font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif"
+    font-size="63"
+    font-weight="300"
+    letter-spacing="0.01em"
+    xml:space="preserve"
+  ><tspan fill="currentColor">GW</tspan><tspan fill="#F0A500">2</tspan><tspan fill="currentColor">R</tspan></text>
+
+  <!--
+    HORIZONTAL RULE
+    A thin line anchors the mark above the subtitle.
+    currentColor at low opacity — barely-there, structural.
+  -->
+  <line
+    x1="4" y1="70"
+    x2="216" y2="70"
+    stroke="currentColor"
+    stroke-width="0.6"
+    opacity="0.16"
+  />
+
+  <!--
+    SUBTITLE: Full firm name
+    IBM Plex Mono — wide tracking, recedes behind the mark.
+    currentColor at low opacity — present but subordinate.
+  -->
+  <text
+    x="4"
+    y="79"
+    font-family="'IBM Plex Mono', 'Menlo', 'Courier New', monospace"
+    font-size="7.5"
+    font-weight="400"
+    letter-spacing="0.22em"
+    fill="currentColor"
+    opacity="0.42"
+  >GROW WEALTH 2 RETIRE</text>
+
+</svg>
